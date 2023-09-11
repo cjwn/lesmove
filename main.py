@@ -93,12 +93,18 @@ def work_20230831():
 
 def work_20230904():
     pathdir = sys.argv[1]
-
     file_worker = FileSqlWork('test23.db')
+    folder = Folders(pathdir, sql_worker=file_worker)
     if len(sys.argv) == 2:
         file_worker.init_table()
-    folder = Folders(pathdir, sql_worker=file_worker)
-    result = folder.walk_through_result(relative_path=True, update_db=True)
+        result = folder.walk_through_result(relative_path=True)
+        for i in result:
+            db_cmd = f"insert into {file_worker.table_name} values (NULL, \"{i['name']}\", \"{i['dir']}\", \
+                        \"{i['relative_path']}\", \"{i['size']}\", NULL)"
+            file_worker.sqlcmd(db_cmd)
+        file_worker.commit()
+    if len(sys.argv) == 3:
+        result = folder.walk_through_result(relative_path=True, update_db=True)
     return True
 
 def work_for_filecounter():
@@ -107,6 +113,6 @@ def work_for_filecounter():
 
 if __name__ == "__main__":
     # work_20230831()
-    # work_20230904()
-    work_for_filecounter()
+    work_20230904()
+    # work_for_filecounter()
 
